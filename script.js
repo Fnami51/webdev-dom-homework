@@ -27,9 +27,12 @@ fetchPromise.then((response) => {
 });
 
 const renderComments = () => {
-  console.log(comments)
-
     const commentHtml = comments.map((comment, index) => {
+
+      let dateNoFormat = new Date(comment.date)
+
+      let dateString = twoDigits(dateNoFormat.getDate()) + "." + twoDigits(dateNoFormat.getMonth() + 1) + "." + dateNoFormat.getFullYear() + " " + twoDigits(dateNoFormat.getHours()) + ":" + twoDigits(dateNoFormat.getMinutes())
+
       /*return `<li class="comment" data-index="${index}">
         <div class="comment-header">
           <div>${comment.author.name}</div>
@@ -51,7 +54,7 @@ const renderComments = () => {
             return `<li class="comment" data-index="${index}">
         <div class="comment-header">
           <div>${comment.author.name}</div>
-          <div>${comment.date}</div>
+          <div>${dateString}</div>
         </div>
         <div class="comment-body">
           <div class="comment-text">
@@ -69,7 +72,7 @@ const renderComments = () => {
             return `<li class="comment" data-index="${index}">
         <div class="comment-header">
           <div>${comment.author.name}</div>
-          <div>${comment.date}</div>
+          <div>${dateString}</div>
         </div>
         <div class="comment-body">
           <div class="comment-text">
@@ -86,8 +89,6 @@ const renderComments = () => {
         }
     }).join("");
 
-    console.log(commentHtml)
-
     commentItems.innerHTML = commentHtml;
 
     const buttonLikes = document.querySelectorAll('.like-button')
@@ -98,18 +99,18 @@ const renderComments = () => {
 
             const index = Number(button.dataset.index);
 
-            let position = Boolean(Number(button.dataset.position));
+            let position = Boolean(Number(comments[index].isLiked));
             
             position = !position;
             
             if (position) {
                 comments[index].likes = comments[index].likes + 1;
-                comments[index].likePosition = 1;
+                comments[index].isLiked = Boolean(1);
                 renderComments();
             }
             if (!position) {
                 comments[index].likes = comments[index].likes - 1;
-                comments[index].likePosition = 0;
+                comments[index].isLiked = Boolean(0);
                 renderComments();
             }
         })
@@ -123,7 +124,7 @@ const renderComments = () => {
 
         const index = Number(comment.dataset.index);
 
-        textElement.value = `↪️ ${comments[index].text}\n\n${comments[index].name}, `;
+        textElement.value = `↪️ ${comments[index].text}\n\n${comments[index].author.name}, `;
       })
     }
 }
@@ -136,7 +137,7 @@ buttonAdd.addEventListener("click", () => {
     textElement.classList.remove("error");
     buttonAdd.classList.remove("error-for-button");
 
-    let regexp = new RegExp('^[а-яa-zА-ЯA-Z↪️]');
+    let regexp = new RegExp('^[а-яa-zА-ЯA-Z0-9↪️]');
 
     if (nameElement.value === "" || textElement.value === "" || !regexp.test(nameElement.value) || !regexp.test(textElement.value)) {
         nameElement.classList.add("error");
@@ -160,7 +161,7 @@ buttonAdd.addEventListener("click", () => {
       const jsonPromiseTwo = fetch("https://wedev-api.sky.pro/api/v1/fnami/comments", {
         method: "GET"
       }).then((response) => {
-        const jsonPromiseTwo = response.json();
+        jsonPromiseTwo = response.json();
   
         jsonPromiseTwo.then((responseData) => {
           comments = responseData.comments;
