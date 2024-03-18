@@ -12,6 +12,7 @@ function twoDigits(num) {
 }
 
 let comments = [];
+let firstLaunch = true;
 
 const reguestAPI = () => {
   fetch("https://wedev-api.sky.pro/api/v1/fnami/comments", {
@@ -21,6 +22,7 @@ const reguestAPI = () => {
     return response.json()})
   .then((responseData) => {
     comments = responseData.comments;
+    firstLaunch = false;
     renderComments();
   });
 };
@@ -28,88 +30,91 @@ const reguestAPI = () => {
 reguestAPI();
 
 const renderComments = () => {
-  const commentHtml = comments.map((comment, index) => {
+  if (firstLaunch) {
+    commentItems.innerHTML = `Подождите, коментарии загружаются ...`;
+  } else{
+    const commentHtml = comments.map((comment, index) => {
+    let dateNoFormat = new Date(comment.date)
 
-  let dateNoFormat = new Date(comment.date)
+    let dateString = twoDigits(dateNoFormat.getDate()) + "." + twoDigits(dateNoFormat.getMonth() + 1) + "." + dateNoFormat.getFullYear() + " " + twoDigits(dateNoFormat.getHours()) + ":" + twoDigits(dateNoFormat.getMinutes())
 
-  let dateString = twoDigits(dateNoFormat.getDate()) + "." + twoDigits(dateNoFormat.getMonth() + 1) + "." + dateNoFormat.getFullYear() + " " + twoDigits(dateNoFormat.getHours()) + ":" + twoDigits(dateNoFormat.getMinutes())
-
-  if (Boolean(comment.isLiked)) {
-    return `<li class="comment" data-index="${index}">
-      <div class="comment-header">
-        <div>${comment.author.name}</div>
-        <div>${dateString}</div>
-      </div>
-      <div class="comment-body">
-        <div class="comment-text">
-          ${comment.text}
+    if (Boolean(comment.isLiked)) {
+      return `<li class="comment" data-index="${index}">
+        <div class="comment-header">
+          <div>${comment.author.name}</div>
+          <div>${dateString}</div>
         </div>
-      </div>
-      <div class="comment-footer">
-        <div class="likes">
-          <span class="likes-counter">${comment.likes}</span>
-          <button class="like-button -active-like" data-index="${index}" data-position="${comment.isLiked}"></button>
+        <div class="comment-body">
+          <div class="comment-text">
+            ${comment.text}
+          </div>
         </div>
-      </div>
-    </li>`;
-  } else {
-    return `<li class="comment" data-index="${index}">
-      <div class="comment-header">
-        <div>${comment.author.name}</div>
-        <div>${dateString}</div>
-      </div>
-      <div class="comment-body">
-        <div class="comment-text">
-          ${comment.text}
+        <div class="comment-footer">
+          <div class="likes">
+            <span class="likes-counter">${comment.likes}</span>
+            <button class="like-button -active-like" data-index="${index}" data-position="${comment.isLiked}"></button>
+          </div>
         </div>
-      </div>
-      <div class="comment-footer">
-        <div class="likes">
-          <span class="likes-counter">${comment.likes}</span>
-          <button class="like-button" data-index="${index}" data-position="${comment.isLiked}"></button>
+      </li>`;
+    } else {
+      return `<li class="comment" data-index="${index}">
+        <div class="comment-header">
+          <div>${comment.author.name}</div>
+          <div>${dateString}</div>
         </div>
-      </div>
-    </li>`;
-  }
-  }).join("");
+        <div class="comment-body">
+          <div class="comment-text">
+            ${comment.text}
+          </div>
+        </div>
+        <div class="comment-footer">
+          <div class="likes">
+            <span class="likes-counter">${comment.likes}</span>
+            <button class="like-button" data-index="${index}" data-position="${comment.isLiked}"></button>
+          </div>
+        </div>
+      </li>`;
+    }
+    }).join("");
 
-  commentItems.innerHTML = commentHtml;
+    commentItems.innerHTML = commentHtml;
 
-  const buttonLikes = document.querySelectorAll('.like-button')
+    const buttonLikes = document.querySelectorAll('.like-button')
 
-  for (const button of buttonLikes) {
-    button.addEventListener("click", (event) => {
-      event.stopPropagation();
+    for (const button of buttonLikes) {
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
 
-      const index = Number(button.dataset.index);
+        const index = Number(button.dataset.index);
 
-      let position = Boolean(Number(comments[index].isLiked));
-            
-      position = !position;
-            
-      if (position) {
-        comments[index].likes = comments[index].likes + 1;
-        comments[index].isLiked = Boolean(1);
-        renderComments();
-      }
-      if (!position) {
-        comments[index].likes = comments[index].likes - 1;
-        comments[index].isLiked = Boolean(0);
-        renderComments();
-      }
-    })
-  }
+        let position = Boolean(Number(comments[index].isLiked));
+              
+        position = !position;
+              
+        if (position) {
+          comments[index].likes = comments[index].likes + 1;
+          comments[index].isLiked = Boolean(1);
+          renderComments();
+        }
+        if (!position) {
+          comments[index].likes = comments[index].likes - 1;
+          comments[index].isLiked = Boolean(0);
+          renderComments();
+        }
+      })
+    }
 
-  const commentElement = document.querySelectorAll(".comment")
+    const commentElement = document.querySelectorAll(".comment")
 
-  for (const comment of commentElement) {
-    comment.addEventListener("click", (event) => {
-      event.stopPropagation();
+    for (const comment of commentElement) {
+      comment.addEventListener("click", (event) => {
+        event.stopPropagation();
 
-      const index = Number(comment.dataset.index);
+        const index = Number(comment.dataset.index);
 
-      textElement.value = `↪️ ${comments[index].text}\n\n${comments[index].author.name}, `;
-     })
+        textElement.value = `↪️ ${comments[index].text}\n\n${comments[index].author.name}, `;
+      })
+    }
   }
 }
 
