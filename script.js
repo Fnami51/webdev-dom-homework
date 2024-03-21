@@ -11,6 +11,11 @@ function twoDigits(num) {
   }
 }
 
+if (!navigator.onLine) {
+  alert("Извините, но у вас проблемы с интернетом")
+  throw new Error ("Нет интернета")
+}
+
 let comments = [];
 let firstLaunch = true;
 
@@ -19,11 +24,28 @@ const reguestAPI = () => {
     method: "GET"
   })
   .then((response) => {
-    return response.json()})
+    if (response.status === 200) {
+      return response.json()
+    } else if (!navigator.onLine) {
+      alert("Извините, но у вас проблемы с интернетом")
+      throw new Error ("Нет интернета")
+    }else if (response.status === 500) {
+      alert("Сервер сломался, попробуй позже 😕")
+      throw new Error ("Ошибка сервира (500)")
+    } else {
+      alert("Кажется, что то пошло не так. Попробуйде другой раз")
+      throw new Error ("Ошибка")
+    }
+  })
   .then((responseData) => {
     comments = responseData.comments;
     firstLaunch = false;
     renderComments();
+  })
+  .catch((error) => {
+    buttonAdd.disabled = false;
+    buttonAdd.textContent = "Написать";
+    firstLaunch = true;
   });
 };
 
@@ -146,18 +168,34 @@ buttonAdd.addEventListener("click", () => {
     })
   })
   .then((response) => {
-    return response.json()
+    if (response.status === 201) {
+      return response.json()
+    } else if (!navigator.onLine) {
+      alert("Извините, но у вас проблемы с интернетом")
+      throw new Error ("Нет интернета")
+    } else if (response.status === 500) {
+      alert("Сервер сломался, попробуй позже 😕")
+      throw new Error ("Ошибка сервира (500)")
+    } else if (response.status === 400) {
+      alert("Врят ли ваше имя состоит из двух букв. Введите текст и имя не менее 3 букв.")
+      throw new Error ("Ошибка ввода")
+    } else {
+      alert("Кажется, что-то не так. Попробуйте в другой раз")
+      throw new Error ("Ошибка")
+    }
   })
   .then((responseData) => {
     comments = responseData.comments;
     reguestAPI();
+    nameElement.value = "";
+    textElement.value = "";
+    buttonAdd.disabled = false;
+    buttonAdd.textContent = "Написать";
+  })
+  .catch((error) => {
     buttonAdd.disabled = false;
     buttonAdd.textContent = "Написать";
   })
     
   reguestAPI();
-
-  nameElement.value = "";
-  textElement.value = "";
-  
 });
