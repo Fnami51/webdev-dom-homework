@@ -11,25 +11,26 @@ function twoDigits(num) {
   }
 }
 
-if (!navigator.onLine) {
-  alert("Извините, но у вас проблемы с интернетом")
-  throw new Error ("Нет интернета")
-}
+function cheakOnline() {if (!navigator.onLine) {
+  commentItems.innerHTML = `<p class="comment-text">Извините, но у вас проблемы с интернетом 😕</p>`;
+  buttonAdd.disabled = false;
+  buttonAdd.textContent = "Написать";
+}}
+
+cheakOnline()
 
 let comments = [];
 let firstLaunch = true;
 
 const reguestAPI = () => {
+  cheakOnline()
   fetch("https://wedev-api.sky.pro/api/v1/fnami/comments", {
     method: "GET"
   })
   .then((response) => {
     if (response.status === 200) {
       return response.json()
-    } else if (!navigator.onLine) {
-      alert("Извините, но у вас проблемы с интернетом")
-      throw new Error ("Нет интернета")
-    }else if (response.status === 500) {
+    } else if (response.status === 500) {
       alert("Сервер сломался, попробуй позже 😕")
       throw new Error ("Ошибка сервира (500)")
     } else {
@@ -148,7 +149,7 @@ buttonAdd.addEventListener("click", () => {
   textElement.classList.remove("error");
   buttonAdd.classList.remove("error-for-button");
 
-  let regexp = new RegExp('^[а-яa-zА-ЯA-Z0-9↪️]');
+  let regexp = new RegExp('^[а-яёa-zА-ЯЁA-Z0-9↪️]');
 
   if (nameElement.value === "" || textElement.value === "" || !regexp.test(nameElement.value) || !regexp.test(textElement.value)) {
     nameElement.classList.add("error");
@@ -160,20 +161,28 @@ buttonAdd.addEventListener("click", () => {
   buttonAdd.disabled = true;
   buttonAdd.textContent = "Ожидайте";
 
+  cheakOnline()
+
   fetch("https://wedev-api.sky.pro/api/v1/fnami/comments", {
     method: "POST",
     body: JSON.stringify({
-      name: nameElement.value,
+      name: nameElement.value
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;"),
       text: textElement.value
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;"),
+      forceError: true
     })
   })
   .then((response) => {
     if (response.status === 201) {
       return response.json()
-    } else if (!navigator.onLine) {
-      alert("Извините, но у вас проблемы с интернетом")
-      throw new Error ("Нет интернета")
-    } else if (response.status === 500) {
+    }  else if (response.status === 500) {
       alert("Сервер сломался, попробуй позже 😕")
       throw new Error ("Ошибка сервира (500)")
     } else if (response.status === 400) {
