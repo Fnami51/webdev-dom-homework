@@ -55,6 +55,7 @@ reguestAPI();
 const renderComments = () => {
   if (firstLaunch) {
     commentItems.innerHTML = `Подождите, коментарии загружаются ...`;
+    cheakOnline()
   } else{
     const commentHtml = comments.map((comment, index) => {
     let dateNoFormat = new Date(comment.date)
