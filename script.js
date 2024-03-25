@@ -12,12 +12,11 @@ function twoDigits(num) {
 }
 
 function cheakOnline() {if (!navigator.onLine) {
-  commentItems.innerHTML = `<p class="comment-text">Извините, но у вас проблемы с интернетом 😕</p>`;
+  alert("Извините, но у вас проблемы с интернетом 😕")
+  commentItems.innerHTML = `<p>Извините, но у вас проблемы с интернетом 😕</p>`;
   buttonAdd.disabled = false;
   buttonAdd.textContent = "Написать";
 }}
-
-cheakOnline()
 
 let comments = [];
 let firstLaunch = true;
@@ -54,8 +53,11 @@ reguestAPI();
 
 const renderComments = () => {
   if (firstLaunch) {
-    commentItems.innerHTML = `Подождите, коментарии загружаются ...`;
-    cheakOnline()
+    if (!navigator.onLine) {
+      commentItems.innerHTML = `<p>Извините, но у вас проблемы с интернетом 😕</p>`;
+    } else {
+      commentItems.innerHTML = `Подождите, коментарии загружаются ...`;
+    }
   } else{
     const commentHtml = comments.map((comment, index) => {
     let dateNoFormat = new Date(comment.date)
@@ -150,7 +152,7 @@ buttonAdd.addEventListener("click", () => {
   textElement.classList.remove("error");
   buttonAdd.classList.remove("error-for-button");
 
-  let regexp = new RegExp('^[а-яёa-zА-ЯЁA-Z0-9↪️]');
+  let regexp = new RegExp('^[^ ]');
 
   if (nameElement.value === "" || textElement.value === "" || !regexp.test(nameElement.value) || !regexp.test(textElement.value)) {
     nameElement.classList.add("error");
