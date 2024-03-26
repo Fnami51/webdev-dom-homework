@@ -1,3 +1,5 @@
+import { getTodo } from '/api.js';
+
 const commentItems = document.getElementById('comments');
 const buttonAdd = document.getElementById('comment-button');
 const nameElement = document.getElementById('comment-author');
@@ -23,26 +25,12 @@ let firstLaunch = true;
 
 const reguestAPI = () => {
   cheakOnline()
-  fetch("https://wedev-api.sky.pro/api/v1/fnami/comments", {
-    method: "GET"
-  })
-  .then((response) => {
-    if (response.status === 200) {
-      return response.json()
-    } else if (response.status === 500) {
-      alert("Сервер сломался, попробуй позже 😕")
-      throw new Error ("Ошибка сервира (500)")
-    } else {
-      throw new Error ("Ошибка")
-    }
-  })
-  .then((responseData) => {
+  getTodo().then((responseData) => {
     comments = responseData.comments;
     firstLaunch = false;
     renderComments();
   })
   .catch((error) => {
-    alert("Кажется, что то пошло не так. Попробуйде другой раз")
     buttonAdd.disabled = false;
     buttonAdd.textContent = "Написать";
     firstLaunch = true;
@@ -192,6 +180,7 @@ buttonAdd.addEventListener("click", () => {
       alert("Врят ли ваше имя состоит из двух букв. Введите текст и имя не менее 3 букв.")
       throw new Error ("Ошибка ввода")
     } else {
+      alert("Кажется, что-то не так. Попробуйте в другой раз")
       throw new Error ("Ошибка")
     }
   })
@@ -204,7 +193,6 @@ buttonAdd.addEventListener("click", () => {
     buttonAdd.textContent = "Написать";
   })
   .catch((error) => {
-    alert("Кажется, что-то не так. Попробуйте в другой раз")
     buttonAdd.disabled = false;
     buttonAdd.textContent = "Написать";
   })
