@@ -1,5 +1,6 @@
 export function getTodo() {
-  return fetch("https://wedev-api.sky.pro/api/v1/fnami/comments", {
+
+  return fetch("https://wedev-api.sky.pro/api/v2/fnami/comments", {
     method: "GET"
   })
     .then((response) => {
@@ -16,8 +17,12 @@ export function getTodo() {
 }
 
 export function postTodo({ nameElement, textElement }) {
-  return fetch("https://wedev-api.sky.pro/api/v1/fnami/comments", {
+  const token = `Bearer ${localStorage.getItem("token")}`;
+  return fetch("https://wedev-api.sky.pro/api/v2/fnami/comments", {
     method: "POST",
+    headers: {
+      Authorization: token,
+    },
     body: JSON.stringify({
       name: nameElement.value
         .replaceAll("&", "&amp;")

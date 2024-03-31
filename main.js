@@ -1,5 +1,5 @@
 import { getTodo,postTodo } from '/api.js';
-import { cheakOnline,twoDigits } from '/secondary-functions.js';
+import { cheakOnline } from '/secondary-functions.js';
 import { renderComments } from '/render.js';
 
 const buttonAdd = document.getElementById('comment-button');
