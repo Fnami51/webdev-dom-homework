@@ -1,6 +1,16 @@
 const commentItems = document.getElementById('comments');
+const inputForm = document.getElementById('form')
 
 import { twoDigits } from '/secondary-functions.js';
+
+const commentForm = `
+<input type="text" id="comment-author" class="add-form-name" placeholder="Введите ваше имя" />
+<textarea type="textarea" id="comment-text" class="add-form-text" placeholder="Введите ваш коментарий" rows="4"></textarea>
+<div class="add-form-row">
+  <button id="comment-button" class="add-form-button">Написать</button>
+</div>`;
+
+const loginLink = `<a class="login-link" href="login.html">Чтобы добавить комментарий, авторизуйтесь</a>`;
 
 export function renderComments({firstLaunch,comments}) {
     if (firstLaunch) {
@@ -92,5 +102,16 @@ export function renderComments({firstLaunch,comments}) {
           textElement.value = `↪️ ${comments[index].text}\n\n${comments[index].author.name}, `;
         })
       }
+    }
+  }
+
+  export function renderForm() {
+    let tokenIs = Boolean(localStorage.getItem("token"))
+    if(tokenIs) {
+      inputForm.innerHTML = commentForm;
+      inputForm.classList.remove("login-box")
+    } else {
+      inputForm.innerHTML = loginLink;
+      inputForm.classList.add("login-box")
     }
   }

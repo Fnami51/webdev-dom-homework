@@ -1,31 +1,33 @@
-import { getTodo,postTodo } from '/api.js';
+import { getTodo, postTodo } from '/api.js';
 import { cheakOnline } from '/secondary-functions.js';
-import { renderComments } from '/render.js';
+import { renderComments, renderForm } from '/render.js';
 
-const buttonAdd = document.getElementById('comment-button');
-const nameElement = document.getElementById('comment-author');
-const textElement = document.getElementById('comment-text');
+export const buttonAdd = document.getElementById('comment-button');
+export const nameElement = document.getElementById('comment-author');
+export const textElement = document.getElementById('comment-text');
 
 let comments = [];
 let firstLaunch = true;
 
 const reguestAPI = () => {
   cheakOnline()
+
   getTodo().then((responseData) => {
     comments = responseData.comments;
     firstLaunch = false;
-    renderComments({firstLaunch,comments});
+    renderComments({ firstLaunch, comments });
   })
-  .catch((error) => {
-    buttonAdd.disabled = false;
-    buttonAdd.textContent = "Написать";
-    firstLaunch = true;
-  });
+    .catch((error) => {
+      buttonAdd.disabled = false;
+      buttonAdd.textContent = "Написать";
+      firstLaunch = true;
+    });
 };
 
 reguestAPI();
 
-renderComments({firstLaunch,comments})
+renderForm()
+renderComments({ firstLaunch, comments })
 
 buttonAdd.addEventListener("click", () => {
 
@@ -47,7 +49,8 @@ buttonAdd.addEventListener("click", () => {
 
   cheakOnline()
 
-  postTodo({ nameElement,textElement }).then((responseData) => {
+
+  postTodo({ nameElement, textElement }).then((responseData) => {
     comments = responseData.comments;
     reguestAPI();
     nameElement.value = "";
@@ -55,10 +58,10 @@ buttonAdd.addEventListener("click", () => {
     buttonAdd.disabled = false;
     buttonAdd.textContent = "Написать";
   })
-  .catch((error) => {
-    buttonAdd.disabled = false;
-    buttonAdd.textContent = "Написать";
-  })
-    
+    .catch((error) => {
+      buttonAdd.disabled = false;
+      buttonAdd.textContent = "Написать";
+    })
+
   reguestAPI();
 });

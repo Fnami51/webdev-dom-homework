@@ -1,3 +1,7 @@
+import { nameElement, textElement, buttonAdd } from './main.js';
+
+
+
 export function cheakOnline() {if (!navigator.onLine) {
     alert("Извините, но у вас проблемы с интернетом 😕")
     commentItems.innerHTML = `<p>Извините, но у вас проблемы с интернетом 😕</p>`;
@@ -12,3 +16,4 @@ export function twoDigits(num) {
       return "" + num;
     }
   }
+
