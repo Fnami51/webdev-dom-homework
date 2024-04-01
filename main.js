@@ -1,22 +1,23 @@
-import { getTodo, postTodo } from '/api.js';
-import { cheakOnline } from '/secondary-functions.js';
-import { renderComments, renderForm } from '/render.js';
+import { getTodo, postTodo } from "/api.js";
+import { cheakOnline } from "/secondary-functions.js";
+import { renderComments, renderForm } from "/render.js";
 
-export const buttonAdd = document.getElementById('comment-button');
-export const nameElement = document.getElementById('comment-author');
-export const textElement = document.getElementById('comment-text');
+export const buttonAdd = document.getElementById("comment-button");
+export const nameElement = document.getElementById("comment-author");
+export const textElement = document.getElementById("comment-text");
 
 let comments = [];
 let firstLaunch = true;
 
 const reguestAPI = () => {
-  cheakOnline()
+  cheakOnline();
 
-  getTodo().then((responseData) => {
-    comments = responseData.comments;
-    firstLaunch = false;
-    renderComments({ firstLaunch, comments });
-  })
+  getTodo()
+    .then((responseData) => {
+      comments = responseData.comments;
+      firstLaunch = false;
+      renderComments({ firstLaunch, comments });
+    })
     .catch((error) => {
       buttonAdd.disabled = false;
       buttonAdd.textContent = "Написать";
@@ -26,18 +27,22 @@ const reguestAPI = () => {
 
 reguestAPI();
 
-renderForm()
-renderComments({ firstLaunch, comments })
+renderForm();
+renderComments({ firstLaunch, comments });
 
 buttonAdd.addEventListener("click", () => {
-
   nameElement.classList.remove("error");
   textElement.classList.remove("error");
   buttonAdd.classList.remove("error-for-button");
 
-  let regexp = new RegExp('^[^ ]');
+  let regexp = new RegExp("^[^ ]");
 
-  if (nameElement.value === "" || textElement.value === "" || !regexp.test(nameElement.value) || !regexp.test(textElement.value)) {
+  if (
+    nameElement.value === "" ||
+    textElement.value === "" ||
+    !regexp.test(nameElement.value) ||
+    !regexp.test(textElement.value)
+  ) {
     nameElement.classList.add("error");
     textElement.classList.add("error");
     buttonAdd.classList.add("error-for-button");
@@ -47,21 +52,21 @@ buttonAdd.addEventListener("click", () => {
   buttonAdd.disabled = true;
   buttonAdd.textContent = "Ожидайте";
 
-  cheakOnline()
+  cheakOnline();
 
-
-  postTodo({ nameElement, textElement }).then((responseData) => {
-    comments = responseData.comments;
-    reguestAPI();
-    nameElement.value = "";
-    textElement.value = "";
-    buttonAdd.disabled = false;
-    buttonAdd.textContent = "Написать";
-  })
-    .catch((error) => {
+  postTodo({ nameElement, textElement })
+    .then((responseData) => {
+      comments = responseData.comments;
+      reguestAPI();
+      nameElement.value = "";
+      textElement.value = "";
       buttonAdd.disabled = false;
       buttonAdd.textContent = "Написать";
     })
+    .catch((error) => {
+      buttonAdd.disabled = false;
+      buttonAdd.textContent = "Написать";
+    });
 
   reguestAPI();
 });

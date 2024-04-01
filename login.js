@@ -1,4 +1,4 @@
-const body = document.getElementById('block-login');
+const body = document.getElementById("block-login");
 let user;
 
 myStorage = window.localStorage;
@@ -30,73 +30,72 @@ const renderRegistrBody = `
 let renderNow = renderLoginBody;
 
 function renderLogin(bodyInput) {
-    body.innerHTML = bodyInput;
-    console.log('Render is OK')
+  body.innerHTML = bodyInput;
+  console.log("Render is OK");
 
-    const buttonChange = document.getElementById('change-button');
+  const buttonChange = document.getElementById("change-button");
 
-    buttonChange.addEventListener("click", (event) => {
-        console.log('Change button is press')
+  buttonChange.addEventListener("click", (event) => {
+    console.log("Change button is press");
 
-        event.stopPropagation();
+    event.stopPropagation();
 
-        if (renderNow === renderLoginBody) {
-            renderNow = renderRegistrBody;
-        } else if (renderNow === renderRegistrBody) {
-            renderNow = renderLoginBody;
-        }
-        renderLogin(renderNow);
-    });
+    if (renderNow === renderLoginBody) {
+      renderNow = renderRegistrBody;
+    } else if (renderNow === renderRegistrBody) {
+      renderNow = renderLoginBody;
+    }
+    renderLogin(renderNow);
+  });
 
-    const loginLogin = document.getElementById('login-login');
-    const nameLogin = document.getElementById('name-login');
-    const passwordLogin = document.getElementById('password-login');
-    const verificationLogin = document.getElementById('password-verification');
-    const buttonSignin = document.getElementById('signin-button');
+  const loginLogin = document.getElementById("login-login");
+  const nameLogin = document.getElementById("name-login");
+  const passwordLogin = document.getElementById("password-login");
+  const verificationLogin = document.getElementById("password-verification");
+  const buttonSignin = document.getElementById("signin-button");
 
-    buttonSignin.addEventListener("click", (event) => {
-        if (renderNow === renderLoginBody) {
-            fetch("https://wedev-api.sky.pro/api/user/login", {
-                method: "POST",
-                body: JSON.stringify({
-                    login: nameLogin.value,
-                    password: passwordLogin.value
-                })
-            })
-            .then((response) => {
-                return response.json()
-            })
-            .then((responseData) => {
-                localStorage.setItem("token", responseData.user.token)
-                window.location.assign("index.html");
-            })
-        }
-        if (renderNow === renderRegistrBody) {
-            passwordLogin.classList.remove("error")
-            verificationLogin.classList.remove("error")
-            if (passwordLogin.value === verificationLogin.value) {
-                fetch("https://wedev-api.sky.pro/api/user/login", {
-                method: "POST",
-                body: JSON.stringify({
-                    login: nameLogin.value,
-                    password: passwordLogin.value
-                })
-                })
-                .then((response) => {
-                    return response.json()
-                })
-                .then((responseData) => {
-                    localStorage.setItem("token", responseData.user.token)
-                    window.location.assign("index.html");
-                })
-            } else {
-                passwordLogin.classList.add("error")
-                verificationLogin.classList.add("error")
-                alert('Пароли не совпадают')
-            }
-        }
-    });
+  buttonSignin.addEventListener("click", (event) => {
+    if (renderNow === renderLoginBody) {
+      fetch("https://wedev-api.sky.pro/api/user/login", {
+        method: "POST",
+        body: JSON.stringify({
+          login: nameLogin.value,
+          password: passwordLogin.value,
+        }),
+      })
+        .then((response) => {
+          return response.json();
+        })
+        .then((responseData) => {
+          localStorage.setItem("token", responseData.user.token);
+          window.location.assign("index.html");
+        });
+    }
+    if (renderNow === renderRegistrBody) {
+      passwordLogin.classList.remove("error");
+      verificationLogin.classList.remove("error");
+      if (passwordLogin.value === verificationLogin.value) {
+        fetch("https://wedev-api.sky.pro/api/user/login", {
+          method: "POST",
+          body: JSON.stringify({
+            login: nameLogin.value,
+            password: passwordLogin.value,
+          }),
+        })
+          .then((response) => {
+            return response.json();
+          })
+          .then((responseData) => {
+            localStorage.setItem("token", responseData.user.token);
+            window.location.assign("index.html");
+          });
+      } else {
+        passwordLogin.classList.add("error");
+        verificationLogin.classList.add("error");
+        alert("Пароли не совпадают");
+      }
+    }
+  });
 }
 
 renderLogin(renderNow);
-
