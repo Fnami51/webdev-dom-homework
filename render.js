@@ -1,7 +1,8 @@
-const commentItems = document.getElementById("comments");
-const inputForm = document.getElementById("form");
+const commentItems = document.getElementById('comments');
+const inputForm = document.getElementById('form')
 
-import { twoDigits } from "/secondary-functions.js";
+import { twoDigits } from '/secondary-functions.js';
+import {  } from "./node_modules/date-fns/format.mjs";
 
 const commentForm = `
 <input type="text" id="comment-author" class="add-form-name" placeholder="Введите ваше имя" />
@@ -12,42 +13,22 @@ const commentForm = `
 
 const loginLink = `<a class="login-link" href="login.html">Чтобы добавить комментарий, авторизуйтесь</a>`;
 
-export function renderForm() {
-  let tokenIs = Boolean(localStorage.getItem("token"));
-  if (tokenIs) {
-    inputForm.innerHTML = commentForm;
-    inputForm.classList.remove("login-box");
-  } else {
-    inputForm.innerHTML = loginLink;
-    inputForm.classList.add("login-box");
-  }
-}
-
-export function renderComments({ firstLaunch, comments }) {
-  if (firstLaunch) {
-    if (!navigator.onLine) {
-      commentItems.innerHTML = `<p>Извините, но у вас проблемы с интернетом 😕</p>`;
-    } else {
-      commentItems.innerHTML = `Подождите, коментарии загружаются ...`;
-    }
-  } else {
-    const commentHtml = comments
-      .map((comment, index) => {
-        let dateNoFormat = new Date(comment.date);
-        let optionDate = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-        let dateString = dateNoFormat.toLocaleDateString('se', optionDate).replace(',', '')
-          /*twoDigits(dateNoFormat.getDate()) +
-          "." +
-          twoDigits(dateNoFormat.getMonth() + 1) +
-          "." +
-          dateNoFormat.getFullYear() +
-          " " +
-          twoDigits(dateNoFormat.getHours()) +
-          ":" +
-          twoDigits(dateNoFormat.getMinutes());*/
-
-        if (Boolean(comment.isLiked)) {
-          return `<li class="comment" data-index="${index}">
+export function renderComments({firstLaunch,comments}) {
+    if (firstLaunch) {
+      if (!navigator.onLine) {
+        commentItems.innerHTML = `<p>Извините, но у вас проблемы с интернетом 😕</p>`;
+      } else {
+        commentItems.innerHTML = `Подождите, коментарии загружаются ...`;
+      }
+    } else{
+      const commentHtml = comments.map((comment, index) => {
+      let dateNoFormat = new Date(comment.date)
+  
+      let dateString = format(dateNoFormat, "yyyy-MM-dd hh.mm.ss")
+      /*twoDigits(dateNoFormat.getDate()) + "." + twoDigits(dateNoFormat.getMonth() + 1) + "." + dateNoFormat.getFullYear() + " " + twoDigits(dateNoFormat.getHours()) + ":" + twoDigits(dateNoFormat.getMinutes())*/
+  
+      if (Boolean(comment.isLiked)) {
+        return `<li class="comment" data-index="${index}">
           <div class="comment-header">
             <div>${comment.author.name}</div>
             <div>${dateString}</div>
@@ -64,8 +45,8 @@ export function renderComments({ firstLaunch, comments }) {
             </div>
           </div>
         </li>`;
-        } else {
-          return `<li class="comment" data-index="${index}">
+      } else {
+        return `<li class="comment" data-index="${index}">
           <div class="comment-header">
             <div>${comment.author.name}</div>
             <div>${dateString}</div>
@@ -82,47 +63,57 @@ export function renderComments({ firstLaunch, comments }) {
             </div>
           </div>
         </li>`;
-        }
-      })
-      .join("");
-
-    commentItems.innerHTML = commentHtml;
-
-    const buttonLikes = document.querySelectorAll(".like-button");
-
-    for (const button of buttonLikes) {
-      button.addEventListener("click", (event) => {
-        event.stopPropagation();
-
-        const index = Number(button.dataset.index);
-
-        let position = Boolean(Number(comments[index].isLiked));
-
-        position = !position;
-
-        if (position) {
-          comments[index].likes = comments[index].likes + 1;
-          comments[index].isLiked = Boolean(1);
-          renderComments({ firstLaunch, comments });
-        }
-        if (!position) {
-          comments[index].likes = comments[index].likes - 1;
-          comments[index].isLiked = Boolean(0);
-          renderComments({ firstLaunch, comments });
-        }
-      });
-    }
-
-    const commentElement = document.querySelectorAll(".comment");
-
-    for (const comment of commentElement) {
-      comment.addEventListener("click", (event) => {
-        event.stopPropagation();
-
-        const index = Number(comment.dataset.index);
-
-        textElement.value = `↪️ ${comments[index].text}\n\n${comments[index].author.name}, `;
-      });
+      }
+      }).join("");
+  
+      commentItems.innerHTML = commentHtml;
+  
+      const buttonLikes = document.querySelectorAll('.like-button')
+  
+      for (const button of buttonLikes) {
+        button.addEventListener("click", (event) => {
+          event.stopPropagation();
+  
+          const index = Number(button.dataset.index);
+  
+          let position = Boolean(Number(comments[index].isLiked));
+                
+          position = !position;
+                
+          if (position) {
+            comments[index].likes = comments[index].likes + 1;
+            comments[index].isLiked = Boolean(1);
+            renderComments({firstLaunch,comments});
+          }
+          if (!position) {
+            comments[index].likes = comments[index].likes - 1;
+            comments[index].isLiked = Boolean(0);
+            renderComments({firstLaunch,comments});
+          }
+        })
+      }
+  
+      const commentElement = document.querySelectorAll(".comment")
+  
+      for (const comment of commentElement) {
+        comment.addEventListener("click", (event) => {
+          event.stopPropagation();
+  
+          const index = Number(comment.dataset.index);
+  
+          textElement.value = `↪️ ${comments[index].text}\n\n${comments[index].author.name}, `;
+        })
+      }
     }
   }
-}
+
+  export function renderForm() {
+    let tokenIs = Boolean(localStorage.getItem("token"))
+    if(tokenIs) {
+      inputForm.innerHTML = commentForm;
+      inputForm.classList.remove("login-box")
+    } else {
+      inputForm.innerHTML = loginLink;
+      inputForm.classList.add("login-box")
+    }
+  }
