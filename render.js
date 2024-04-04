@@ -1,11 +1,13 @@
-const commentItems = document.getElementById('comments');
+export const commentItems = document.getElementById('comments');
 const inputForm = document.getElementById('form')
 
-import { twoDigits } from '/secondary-functions.js';
-import {  } from "./node_modules/date-fns/format.mjs";
+import { cheakOnline } from '/secondary-functions.js';
+import { format } from "date-fns";
+import { postTodo } from './api.js';
+import { reguestAPI } from './main.js';
 
 const commentForm = `
-<input type="text" id="comment-author" class="add-form-name" placeholder="Введите ваше имя" />
+<input readonly type="text" id="comment-author" class="add-form-name" placeholder="Введите ваше имя" value="${localStorage.getItem("name")}"/>
 <textarea type="textarea" id="comment-text" class="add-form-text" placeholder="Введите ваш коментарий" rows="4"></textarea>
 <div class="add-form-row">
   <button id="comment-button" class="add-form-button">Написать</button>
@@ -100,9 +102,10 @@ export function renderComments({firstLaunch,comments}) {
           event.stopPropagation();
   
           const index = Number(comment.dataset.index);
-  
+          const textElement = document.getElementById('comment-text');
+          if(textElement){
           textElement.value = `↪️ ${comments[index].text}\n\n${comments[index].author.name}, `;
-        })
+        }})
       }
     }
   }
@@ -112,8 +115,51 @@ export function renderComments({firstLaunch,comments}) {
     if(tokenIs) {
       inputForm.innerHTML = commentForm;
       inputForm.classList.remove("login-box")
+
+      const buttonAdd = document.getElementById('comment-button');
+      const nameElement = document.getElementById('comment-author');
+      const textElement = document.getElementById('comment-text');
+
+      buttonAdd.addEventListener("click", () => {
+
+        textElement.classList.remove("error");
+        buttonAdd.classList.remove("error-for-button");
+      
+        let regexp = new RegExp('^[^ ]');
+      
+        if (nameElement.value === "" || textElement.value === "" || !regexp.test(nameElement.value) || !regexp.test(textElement.value)) {
+          textElement.classList.add("error");
+          buttonAdd.classList.add("error-for-button");
+          return;
+        }
+      
+        buttonAdd.disabled = true;
+        buttonAdd.textContent = "Ожидайте";
+      
+        cheakOnline()
+      
+      
+        postTodo({ nameElement, textElement }).then((responseData) => {
+          comments = responseData.comments;
+          reguestAPI();
+          textElement.value = "";
+          buttonAdd.disabled = false;
+          buttonAdd.textContent = "Написать";
+        })
+          .catch((error) => {
+            alert(error.message);
+          })
+          .finally(() => {
+            buttonAdd.disabled = false;
+            buttonAdd.textContent = "Написать";
+            firstLaunch = true;
+          })
+      
+      });
     } else {
       inputForm.innerHTML = loginLink;
       inputForm.classList.add("login-box")
     }
   }
+
+  

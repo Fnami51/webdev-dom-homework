@@ -64,11 +64,20 @@ function renderLogin(bodyInput) {
                 })
             })
             .then((response) => {
-                return response.json()
+                if (response.ok){
+                    return response.json()
+                } else if (response.status === 400){
+                    throw new Error("Неверный логин или пароль")
+                }
             })
             .then((responseData) => {
                 localStorage.setItem("token", responseData.user.token)
+                localStorage.setItem("name", responseData.user.name)
                 window.location.assign("index.html");
+            })
+            .catch((error) => {
+                alert(error.message)
+                throw error
             })
         }
         if (renderNow === renderRegistrBody) {
