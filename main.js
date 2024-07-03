@@ -1,0 +1,64 @@
+import { getTodo,postTodo } from '/api.js';
+import { cheakOnline,twoDigits } from '/secondary-functions.js';
+import { renderComments } from '/render.js';
+
+const buttonAdd = document.getElementById('comment-button');
+const nameElement = document.getElementById('comment-author');
+const textElement = document.getElementById('comment-text');
+
+let comments = [];
+let firstLaunch = true;
+
+const reguestAPI = () => {
+  cheakOnline()
+  getTodo().then((responseData) => {
+    comments = responseData.comments;
+    firstLaunch = false;
+    renderComments({firstLaunch,comments});
+  })
+  .catch((error) => {
+    buttonAdd.disabled = false;
+    buttonAdd.textContent = "Написать";
+    firstLaunch = true;
+  });
+};
+
+reguestAPI();
+
+renderComments({firstLaunch,comments})
+
+buttonAdd.addEventListener("click", () => {
+
+  nameElement.classList.remove("error");
+  textElement.classList.remove("error");
+  buttonAdd.classList.remove("error-for-button");
+
+  let regexp = new RegExp('^[^ ]');
+
+  if (nameElement.value === "" || textElement.value === "" || !regexp.test(nameElement.value) || !regexp.test(textElement.value)) {
+    nameElement.classList.add("error");
+    textElement.classList.add("error");
+    buttonAdd.classList.add("error-for-button");
+    return;
+  }
+
+  buttonAdd.disabled = true;
+  buttonAdd.textContent = "Ожидайте";
+
+  cheakOnline()
+
+  postTodo({ nameElement,textElement }).then((responseData) => {
+    comments = responseData.comments;
+    reguestAPI();
+    nameElement.value = "";
+    textElement.value = "";
+    buttonAdd.disabled = false;
+    buttonAdd.textContent = "Написать";
+  })
+  .catch((error) => {
+    buttonAdd.disabled = false;
+    buttonAdd.textContent = "Написать";
+  })
+    
+  reguestAPI();
+});
